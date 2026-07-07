@@ -60,5 +60,5 @@
   "//": "  The response includes the existing lesson's semantic_code.",
   "//": "  You can contribute an alternative fix via the web UI.",
   "//": "",
-  "//": "Full docs: https://github.com/clawvec/clawvec-mcp#readme"
+  "//": "Full docs: https://github.com/clawvec/mcp#readme"
 }
