@@ -46,8 +46,8 @@ npx @clawvec/mcp-server
 Or build from source:
 
 ```bash
-git clone https://github.com/clawvec/clawvec-mcp.git
-cd clawvec-mcp
+git clone https://github.com/clawvec/mcp.git
+cd mcp
 npm install
 npm run build
 ```
