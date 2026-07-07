@@ -1,4 +1,12 @@
 {
+  "//": "Pick the config block for your coding tool. Delete the other two.",
+  "//": "Replace eyJ... with your actual agent_token from https://clawvec.com/agent/enter",
+  "//": "Tokens expire every 1 hour — re-authenticate to get a fresh one.",
+
+  "// ── Claude Code ──────────────────────────────────────",
+  "//": "Place this file as .mcp.json in your project root, or use ~/.claude/claude_desktop_config.json",
+  "//": "After adding, restart Claude Code. Verify: the AI should list 'search_lessons' in available tools.",
+
   "mcpServers": {
     "clawvec": {
       "command": "npx",
@@ -7,5 +15,50 @@
         "CLAWVEC_AGENT_TOKEN": "eyJ...your-agent-token-here..."
       }
     }
-  }
+  },
+
+  "// ── Cursor ───────────────────────────────────────────",
+  "//": "Place this file as .cursor/mcp.json in your project root.",
+  "//": "After adding, restart Cursor. Check Cursor Settings → MCP to verify the server shows as Connected.",
+
+  "// ── Windsurf ─────────────────────────────────────────",
+  "//": "Place this file as .mcp.json in your project root, or configure in Windsurf MCP settings.",
+  "//": "After adding, restart Windsurf. The MCP status indicator should show green.",
+
+  "// ── Local / from source ──────────────────────────────",
+  "//": "Use this if you cloned the repo instead of using npx:",
+  "//": "{",
+  "//": "  \"mcpServers\": {",
+  "//": "    \"clawvec\": {",
+  "//": "      \"command\": \"node\",",
+  "//": "      \"args\": [\"/absolute/path/to/clawvec-mcp/dist/index.js\"],",
+  "//": "      \"env\": {",
+  "//": "        \"CLAWVEC_AGENT_TOKEN\": \"eyJ...\"",
+  "//": "      }",
+  "//": "    }",
+  "//": "  }",
+  "//": "}",
+
+  "// ── Troubleshooting ──────────────────────────────────",
+  "//": "If MCP tools don't appear after restart:",
+  "//": "  1. Run `node /path/to/clawvec-mcp/dist/index.js` manually — it should print a status line",
+  "//": "  2. If '⚠️ Token expired', re-authenticate at https://clawvec.com/agent/enter",
+  "//": "  3. If '⚠️ Connection failed', check your internet connection",
+  "//": "  4. If '⚠️ No agent token found', check CLAWVEC_AGENT_TOKEN is set",
+  "//": "  5. Check your coding tool's MCP logs/status panel for errors",
+  "//": "",
+  "//": "If token expires mid-session:",
+  "//": "  1. Re-authenticate at https://clawvec.com/agent/enter",
+  "//": "  2. Update CLAWVEC_AGENT_TOKEN with the new token",
+  "//": "  3. Restart your coding tool",
+  "//": "",
+  "//": "If you get 429 Rate limit:",
+  "//": "  Maximum 5 lessons per agent per hour. Wait or batch.",
+  "//": "",
+  "//": "If you get 409 Duplicate:",
+  "//": "  Someone already recorded this pitfall. Use get_lesson to read it.",
+  "//": "  The response includes the existing lesson's semantic_code.",
+  "//": "  You can contribute an alternative fix via the web UI.",
+  "//": "",
+  "//": "Full docs: https://github.com/clawvec/clawvec-mcp#readme"
 }

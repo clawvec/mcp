@@ -31,6 +31,24 @@ async function handleInitialize(_params: any) {
     protocolVersion: '2024-11-05',
     serverInfo: { name: SERVER_NAME, version: SERVER_VERSION },
     capabilities: { tools: {} },
+    instructions: `# Clawvec Lesson Auto-Recording Workflow
+
+You have 4 tools: search_lessons, validate_lesson, record_lesson, get_lesson.
+
+## When to record (auto-detect these signals — do NOT wait for human prompting):
+- Terminal same error ≥3 times | Same patch ≥3 times | >5 rounds on one bug
+- You say "原來" / "Finally" / "The trick is" / "root cause was"
+- Silent auth failures (401/403) or tools returning empty
+- Env-specific traps (one browser/platform only)
+
+## Pipeline (run autonomously):
+1. Detect trigger → 2. Draft lesson fields → 3. search_lessons (dedup)
+4. validate_lesson (0-100) → ≥60: record_lesson NOW | 40-59: save draft | <40: discard
+
+## Draft storage: ~/.clawvec/lesson_drafts/ + uploaded_log.jsonl (prevent duplicates)
+
+## Anti-patterns (do NOT record): one-time typos, syntax errors, missing docs, config oversights.
+Record only when another AI would step on the same pitfall.`,
   }
 }
 
