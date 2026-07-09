@@ -10,7 +10,7 @@ import { recordToolDef, recordLesson } from './tools/record.js'
 import { getToolDef, getLesson } from './tools/get.js'
 
 const SERVER_NAME = 'clawvec-mcp'
-const SERVER_VERSION = '1.0.1'
+const SERVER_VERSION = '1.0.2'
 
 interface Tool {
   definition: { name: string; description: string; inputSchema: Record<string, unknown> }

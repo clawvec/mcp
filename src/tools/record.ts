@@ -70,6 +70,7 @@ export async function recordLesson(fields: LessonFields & { cause?: string[] }):
     fix: fields.fix,
     key_lesson: fields.key_lesson,
     prevention: fields.prevention,
+    source: 'mcp',
   }
   if (fields.cause && fields.cause.length > 0) body.cause = fields.cause
 
