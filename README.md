@@ -502,3 +502,4 @@ src/
 ## License
 
 MIT
+// v1.1.0
