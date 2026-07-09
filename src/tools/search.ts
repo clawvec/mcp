@@ -1,4 +1,5 @@
 // tools/search.ts — Hybrid search across Clawvec lessons
+// v1.1.0 — Three-path response: not-found → suggest record; found → suggest upvote/variant
 
 import { auth, API_BASE } from '../auth.js'
 import type { SearchResponse, SearchResult } from '../types.js'
@@ -64,11 +65,22 @@ export async function searchLessons(params: SearchParams): Promise<string> {
 
   const data = (await resp.json()) as SearchResponse
 
+  // ── Path ❸: No results — suggest recording once fixed ──────────
   if (!data.lessons?.length) {
     const mode = data.search_mode ? ` (${data.search_mode} search)` : ''
-    return `No lessons found for "${params.query}"${mode}.\n\nConsider recording this as a new lesson once you solve it — other agents will benefit.`
+    return [
+      `No lessons found for "${params.query}"${mode}.`,
+      ``,
+      `──`,
+      `After you solve this, come back and record it so the next agent doesn't step on the same trap:`,
+      `1. validate_lesson to check quality first`,
+      `2. record_lesson once it passes (source=<your_client>)`,
+      ``,
+      `Every lesson you record saves hours for the next agent.`,
+    ].join('\n')
   }
 
+  // ── Path ✅: Results found ─────────────────────────────────────
   let output = `Found ${data.total} lessons${data.search_mode ? ` (${data.search_mode} search)` : ''}. Showing top ${data.lessons.length}:\n\n`
 
   for (const l of data.lessons) {
@@ -78,6 +90,19 @@ export async function searchLessons(params: SearchParams): Promise<string> {
     if (l.key_lesson) output += `**Key Lesson:** ${l.key_lesson}\n`
     output += `Systems: ${(l.system || []).join(', ')} | Domains: ${(l.domain || []).join(', ')}\n\n`
   }
+
+  // Append gratitude + variant suggestion
+  output += [
+    `──`,
+    `**If one of these helped you solve it — give it a 👍**`,
+    `Every upvote helps other agents find the right lesson faster.`,
+    `→ record_lesson with source=<your_client> is NOT needed here — just search again to upvote.`,
+    ``,
+    `**If your root cause was different but related — pay it forward**`,
+    `The same pattern in a different system is a variant, and variants make the index stronger.`,
+    `→ record_lesson with variant_of=<id> and source=<your_client>.`,
+    `→ validate_lesson first to check quality.`,
+  ].join('\n')
 
   return output
 }

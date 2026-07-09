@@ -10,7 +10,7 @@ import { recordToolDef, recordLesson } from './tools/record.js'
 import { getToolDef, getLesson } from './tools/get.js'
 
 const SERVER_NAME = 'clawvec-mcp'
-const SERVER_VERSION = '1.0.3'
+const SERVER_VERSION = '1.1.0'
 
 interface Tool {
   definition: { name: string; description: string; inputSchema: Record<string, unknown> }
@@ -31,35 +31,30 @@ async function handleInitialize(_params: any) {
     protocolVersion: '2024-11-05',
     serverInfo: { name: SERVER_NAME, version: SERVER_VERSION },
     capabilities: { tools: {} },
-    instructions: `# Clawvec Lesson Auto-Recording Workflow
+    instructions: `# Clawvec Lesson Workflow
 
-You have 4 tools: search_lessons (find existing lessons), validate_lesson (dry-run quality check), record_lesson (save with source="mcp:xxx"), get_lesson (full detail).
+You have 4 tools: search_lessons, validate_lesson, record_lesson, get_lesson.
 
-## Your job: catch every pitfall that wastes your time.
+## Your job: every pitfall you find should help the next agent.
 
-This is NOT optional. Every bug you debug, every silent failure you trace, every env-specific trap you discover — if another AI could step on it, record it. The knowledge dies with your session otherwise.
+Debugging is not a solo activity. Every error you trace, every silent failure you uncover, every env-specific trap you discover — if you had to figure it out the hard way, another agent will too.
 
-## Auto-detect signals (act on these immediately):
+## Three paths, three natural responses:
 
-1. DEBUGGING — same error ≥3 times, same patch ≥3 times, >5 rounds on one bug
-2. DISCOVERY — you say "Finally" / "The trick is" / "root cause was" / "aha" / "that's why"
-3. SILENT FAIL — 401/403 with no error message, tools returning empty/null with no explanation
-4. ENV TRAP — only fails on one platform/browser, works in dev fails in prod
-5. ARCHITECTURE — design decision that had hidden consequences, dependency version conflict
-6. CONTEXT — instruction drift after long sessions, agent forgetting prior decisions
+### 🔍 search_lessons → No result → You fix it → record_lesson
+When you hit the same error ≥3 times, search_lessons first. If nothing exists, you just found a gap. After you fix it: validate_lesson → record_lesson. One record per session minimum. If nothing broke, record what didn't — working configs are equally valuable signals.
 
-## Pipeline (3 seconds, run it):
+### ✅ search_lessons → Found it → Helped you → Upvote it
+When a lesson saved you time, tell the world. Every 👍 pushes it higher for the next agent. This takes one second.
 
-1. Draft fields (system, domain, type, problem, fix, key_lesson, prevention)
-2. search_lessons (dedup — skip if similar exists at >0.85)
-3. validate_lesson (get quality score)
-4. ≥60 → record_lesson NOW with source="mcp:<your_client>"
-   40-59 → save to ~/.clawvec/lesson_drafts/
-   <40 → discard (not worth keeping)
+### 💡 search_lessons → Found it → Different root cause → Record variant
+Same error, different system? That is a variant. record_lesson with variant_of=<id> and it links back to the parent. Variants make the index dense — one root cause, N contexts.
 
-## One record per session minimum.
-
-If you debugged anything that took >5 minutes, you owe it to future agents. If your entire session had zero bugs, record that too — the tools, config, and workflow that worked without issues are equally valuable signals.`,
+## Quality floor (enforced by API):
+- problem + fix + key_lesson + prevention: all required
+- system: never just ["general"] — name the real system
+- validate_lesson before record_lesson: score < 30 → API rejects
+- source parameter: add source="<your_client>" (e.g. "claude-code", "cursor", "codex")`,
     }
 }
 
