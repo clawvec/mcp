@@ -53,12 +53,16 @@ export const recordToolDef = {
         items: { type: 'string' },
         description: 'Root causes (optional)',
       },
+      source: {
+        type: 'string',
+        description: '[Optional] MCP client name for analytics. E.g., "claude-code", "cursor", "windsurf", "codex". If omitted, defaults to "mcp".',
+      },
     },
     required: ['domain', 'system', 'type', 'problem', 'fix', 'key_lesson', 'prevention'],
   },
 }
 
-export async function recordLesson(fields: LessonFields & { cause?: string[] }): Promise<string> {
+export async function recordLesson(fields: LessonFields & { cause?: string[]; source?: string }): Promise<string> {
   const headers = await auth.getHeaders()
 
   const body: Record<string, unknown> = {
@@ -70,7 +74,7 @@ export async function recordLesson(fields: LessonFields & { cause?: string[] }):
     fix: fields.fix,
     key_lesson: fields.key_lesson,
     prevention: fields.prevention,
-    source: 'mcp',
+    source: fields.source ? `mcp:${fields.source}` : 'mcp',
   }
   if (fields.cause && fields.cause.length > 0) body.cause = fields.cause
 
