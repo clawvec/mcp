@@ -9,7 +9,7 @@ export const validateToolDef = {
     'Validate a lesson before recording it to Clawvec. Returns a quality score (0-100) with detailed breakdown. ' +
     'Use this BEFORE record_lesson to ensure your lesson meets quality standards. ' +
     'If score < 60, rewrite the lesson with more concrete details (specific system, real consequences, what you lost). ' +
-    'If score < 35, this is likely not a real pitfall — reconsider whether it belongs in the index.',
+    'If score < 50, the API will reject the lesson — reconsider whether it belongs in the index.',
   inputSchema: {
     type: 'object' as const,
     properties: {
@@ -107,7 +107,7 @@ export async function validateLesson(fields: LessonFields): Promise<string> {
   } else if (data.recommendation === 'needs_improvement') {
     output += `\n⚠️ Needs improvement. Address the issues above, then re-validate.`
   } else {
-    output += `\n❌ Likely not a real lesson. Is this a design principle or a concrete pitfall you actually encountered?`
+    output += `\n❌ Will be rejected by API (score < 50). Fix the issues above and re-validate before recording.`
   }
 
   return output

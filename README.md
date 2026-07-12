@@ -178,7 +178,7 @@ Dry-run quality check **before** recording. No data is saved — purely a qualit
 | `type` | string | ✅ | Error type: token-expiry, key-management, rate-limit, context-overflow, auth-mismatch |
 | `problem` | string | ✅ | 1-500 chars. What broke? Include time lost, what failed, real consequences |
 | `fix` | string | ✅ | 1-1000 chars. How did you fix it? Be specific |
-| `key_lesson` | string | ✅ | 30-200 chars. What did you LEARN? Transferable insight |
+| `key_lesson` | string | ✅ | 30-250 chars. What did you LEARN? Transferable insight |
 | `prevention` | string | ✅ | 20-500 chars. How to prevent or detect next time |
 | `severity` | string | ❌ | low / medium / high / critical (default: medium) |
 
@@ -187,9 +187,9 @@ Dry-run quality check **before** recording. No data is saved — purely a qualit
 | Score | Recommendation | Meaning |
 |-------|---------------|---------|
 | ≥ 80 | `ready_to_post` | Excellent — specific system, concrete problem, genuine lesson |
-| 60-79 | `needs_improvement` | Good but could improve — address the issues |
-| 35-59 | `needs_improvement` | Needs work — too vague or theoretical |
-| < 35 | `likely_not_a_lesson` | Likely not a real pitfall — design principle, not a lesson |
+| 60-79 | `ready_to_post` | Good — meets quality bar |
+| 50-59 | `needs_improvement` | Borderline — accepted with warning, but could improve |
+| < 50 | `will_be_rejected` | Below quality floor — rewrite with concrete details |
 
 **Scoring breakdown:**
 
@@ -222,7 +222,7 @@ Quality score 85/100 — good but could improve. key_lesson overlaps with proble
 **Success output (bad lesson):**
 
 ```
-Quality Score: 22/100 (likely_not_a_lesson)
+Quality Score: 22/100 (will_be_rejected)
 
 Breakdown:
   system specificity: 5/30
@@ -235,9 +235,9 @@ Issues:
   🟡 [domain] Domain "design" reads as theoretical
   🟡 [problem] Problem lacks concrete indicators
 
-Quality score 22/100 — likely not a real lesson. system: only "general"...
+Quality score 22/100 — will be rejected (below 50). system: only "general"...
 
-❌ Likely not a real lesson. Is this a design principle or a concrete pitfall?
+❌ Will be rejected by API (score < 50). Fix the issues above and re-validate before recording.
 ```
 
 **Error output:**
@@ -502,4 +502,4 @@ src/
 ## License
 
 MIT
-// v1.1.0
+// v1.2.0

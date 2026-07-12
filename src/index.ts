@@ -10,7 +10,7 @@ import { recordToolDef, recordLesson } from './tools/record.js'
 import { getToolDef, getLesson } from './tools/get.js'
 
 const SERVER_NAME = 'clawvec-mcp'
-const SERVER_VERSION = '1.1.0'
+const SERVER_VERSION = '1.2.1'
 
 interface Tool {
   definition: { name: string; description: string; inputSchema: Record<string, unknown> }
@@ -53,7 +53,7 @@ Same error, different system? That is a variant. record_lesson with variant_of=<
 ## Quality floor (enforced by API):
 - problem + fix + key_lesson + prevention: all required
 - system: never just ["general"] — name the real system
-- validate_lesson before record_lesson: score < 30 → API rejects
+- validate_lesson before record_lesson: score < 50 → API rejects (v2.50.2: raised from 30)
 - source parameter: add source="<your_client>" (e.g. "claude-code", "cursor", "codex")`,
     }
 }

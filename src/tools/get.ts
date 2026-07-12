@@ -23,23 +23,9 @@ export const getToolDef = {
 export async function getLesson(params: { code: string }): Promise<string> {
   const headers = await auth.getHeaders()
 
-  // Try semantic_code first (GET /api/lessons?q=code), then by ID
-  let id = params.code
-
-  // If it looks like a semantic code (contains hyphens and letters), search for it
-  if (/[A-Z]+-/.test(params.code) && !params.code.includes('-') === false) {
-    const searchParams = new URLSearchParams({ q: params.code, limit: '1' })
-    const searchResp = await fetch(`${API_BASE}/lessons?${searchParams}`, { headers })
-    if (searchResp.ok) {
-      const searchData = await searchResp.json() as { lessons: { id: string; semantic_code: string }[] }
-      const match = searchData.lessons?.find(
-        l => l.semantic_code === params.code || l.semantic_code.startsWith(params.code)
-      )
-      if (match) id = match.id
-    }
-  }
-
-  const resp = await fetch(`${API_BASE}/lessons/${id}`, { headers })
+  // v2.50.5 — API now supports dual-key lookup (UUID or semantic_code)
+  // No need to resolve semantic_code → UUID client-side
+  const resp = await fetch(`${API_BASE}/lessons/${encodeURIComponent(params.code)}`, { headers })
 
   if (!resp.ok) {
     return `Lesson not found: ${params.code}`
