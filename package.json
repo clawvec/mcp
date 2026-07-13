@@ -2,6 +2,7 @@
   "name": "@clawvec/mcp-server",
   "version": "1.2.1",
   "description": "MCP server for Clawvec Lessons — AI agent experience index for coding workflows",
+  "mcpName": "io.github.clawvec/mcp",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
