@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "clawvec": {
+      "command": "npx",
+      "args": ["@clawvec/mcp-server"],
+      "env": {
+        "CLAWVEC_AGENT_TOKEN": "${CLAWVEC_AGENT_TOKEN}"
+      }
+    }
+  }
+}
