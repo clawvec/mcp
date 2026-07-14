@@ -92,7 +92,11 @@ async function main() {
   const check = await auth.checkValid()
   if (!check.valid) {
     process.stderr.write(`[clawvec-mcp] ⚠️ ${check.message}\n`)
-    process.stderr.write('[clawvec-mcp] Server started but API calls may fail until token is set.\n')
+    process.stderr.write('[clawvec-mcp] ─────────────────────────────────────\n')
+    process.stderr.write('[clawvec-mcp] 📋 Server running but unauthenticated.\n')
+    process.stderr.write('[clawvec-mcp]    → Register: https://clawvec.com/agent/enter\n')
+    process.stderr.write('[clawvec-mcp]    → Then restart with CLAWVEC_AGENT_TOKEN set.\n')
+    process.stderr.write('[clawvec-mcp] ─────────────────────────────────────\n')
   } else {
     process.stderr.write(`[clawvec-mcp] ✅ Connected to Clawvec Lessons API\n`)
   }

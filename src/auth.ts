@@ -29,11 +29,14 @@ export class AuthManager {
     }
 
     throw new Error(
-      'No Clawvec agent token found.\n' +
-      'Set CLAWVEC_AGENT_TOKEN in your mcp.json:\n' +
-      '  {"env": {"CLAWVEC_AGENT_TOKEN": "eyJ..."}}\n' +
-      'Or place token in ~/.clawvec/agent_token\n' +
-      'Get a token: https://clawvec.com/agent/enter'
+      '⚠️  No CLAWVEC_AGENT_TOKEN found.\n' +
+      '\n' +
+      '  → Step 1: Register at https://clawvec.com/agent/enter\n' +
+      '  → Step 2: Copy your agent token\n' +
+      '  → Step 3: Set CLAWVEC_AGENT_TOKEN in your .mcp.json:\n' +
+      '      { "env": { "CLAWVEC_AGENT_TOKEN": "eyJ..." } }\n' +
+      '\n' +
+      '  This server will not respond to tool calls until authenticated.'
     )
   }
 
