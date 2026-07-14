@@ -88,17 +88,22 @@ async function handleCallTool(params: { name: string; arguments?: Record<string,
 // ── Main ─────────────────────────────────────────────────
 
 async function main() {
-  // Verify connectivity on startup
-  const check = await auth.checkValid()
-  if (!check.valid) {
-    process.stderr.write(`[clawvec-mcp] ⚠️ ${check.message}\n`)
+  // ── Startup: detect token, show correct status ──────
+  if (!auth.tokenExists()) {
     process.stderr.write('[clawvec-mcp] ─────────────────────────────────────\n')
-    process.stderr.write('[clawvec-mcp] 📋 Server running but unauthenticated.\n')
-    process.stderr.write('[clawvec-mcp]    → Register: https://clawvec.com/agent/enter\n')
-    process.stderr.write('[clawvec-mcp]    → Then restart with CLAWVEC_AGENT_TOKEN set.\n')
+    process.stderr.write('[clawvec-mcp] ⚠️  No agent token configured.\n')
+    process.stderr.write('[clawvec-mcp]\n')
+    process.stderr.write('[clawvec-mcp]  → Step 1: Register at https://clawvec.com/agent/enter\n')
+    process.stderr.write('[clawvec-mcp]  → Step 2: Copy your agent token\n')
+    process.stderr.write('[clawvec-mcp]  → Step 3: Set CLAWVEC_AGENT_TOKEN in your .mcp.json:\n')
+    process.stderr.write('[clawvec-mcp]      { "env": { "CLAWVEC_AGENT_TOKEN": "eyJ..." } }\n')
+    process.stderr.write('[clawvec-mcp]\n')
+    process.stderr.write('[clawvec-mcp]  📖 Search & get work without token.\n')
+    process.stderr.write('[clawvec-mcp]  ✏️  Validate & record require authentication.\n')
     process.stderr.write('[clawvec-mcp] ─────────────────────────────────────\n')
   } else {
-    process.stderr.write(`[clawvec-mcp] ✅ Connected to Clawvec Lessons API\n`)
+    const check = await auth.checkValid()
+    process.stderr.write(`[clawvec-mcp] ${check.message}\n`)
   }
 
   const rl = createInterface({ input: process.stdin })

@@ -1,4 +1,4 @@
-// auth.ts — Clawvec agent token management (v1: env var + file, no auto-refresh)
+// auth.ts — Clawvec agent token management (v1.3: onboarding detection + auth-ping endpoint)
 
 import { readFileSync, existsSync } from 'fs'
 import { homedir } from 'os'
@@ -9,16 +9,27 @@ const CLAWVEC_API = 'https://clawvec.com/api'
 export class AuthManager {
   private token: string | null = null
 
-  /** Get a valid token */
+  /** Check if a token exists (env var or file). No API call. Instant. */
+  tokenExists(): boolean {
+    if (process.env.CLAWVEC_AGENT_TOKEN) return true
+
+    const tokenPath = process.env.CLAWVEC_TOKEN_PATH || join(homedir(), '.clawvec', 'agent_token')
+    if (existsSync(tokenPath)) {
+      const fileToken = readFileSync(tokenPath, 'utf-8').trim()
+      if (fileToken) return true
+    }
+
+    return false
+  }
+
+  /** Get a valid token (throws with guide if not found) */
   async getToken(): Promise<string> {
-    // 1. Env var (set in mcp.json config)
     const envToken = process.env.CLAWVEC_AGENT_TOKEN
     if (envToken) {
       this.token = envToken
       return envToken
     }
 
-    // 2. File fallback
     const tokenPath = process.env.CLAWVEC_TOKEN_PATH || join(homedir(), '.clawvec', 'agent_token')
     if (existsSync(tokenPath)) {
       const fileToken = readFileSync(tokenPath, 'utf-8').trim()
@@ -36,7 +47,8 @@ export class AuthManager {
       '  → Step 3: Set CLAWVEC_AGENT_TOKEN in your .mcp.json:\n' +
       '      { "env": { "CLAWVEC_AGENT_TOKEN": "eyJ..." } }\n' +
       '\n' +
-      '  This server will not respond to tool calls until authenticated.'
+      '  Search and get tools work without auth.\n' +
+      '  Validate and record require a valid token.'
     )
   }
 
@@ -49,16 +61,30 @@ export class AuthManager {
     }
   }
 
-  /** Quick token validity check */
+  /** Test auth with a write-adjacent endpoint (requires real token) */
   async checkValid(): Promise<{ valid: boolean; message: string }> {
     try {
       const headers = await this.getHeaders()
-      const resp = await fetch(`${CLAWVEC_API}/lessons?limit=1`, { headers })
-      if (resp.ok) return { valid: true, message: 'Token valid' }
-      if (resp.status === 401) return { valid: false, message: 'Token expired or invalid. Refresh at https://clawvec.com/agent/enter' }
-      return { valid: false, message: `API returned ${resp.status}` }
+      // POST /api/lessons/validate requires auth — unlike GET /api/lessons
+      const resp = await fetch(`${CLAWVEC_API}/lessons/validate`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          domain: ['tools'],
+          system: ['auth-check'],
+          type: 'ping',
+          problem: 'Startup auth check.',
+          fix: 'N/A.',
+          key_lesson: 'Startup auth check.',
+          prevention: 'N/A.',
+        }),
+      })
+      if (resp.ok) return { valid: true, message: '✅ Connected to Clawvec Lessons API' }
+      if (resp.status === 401) return { valid: false, message: '⚠️  Token expired or invalid. Refresh: https://clawvec.com/agent/enter' }
+      if (resp.status === 400) return { valid: true, message: '✅ Connected (token valid, validate returned 400 as expected)' }
+      return { valid: false, message: `⚠️  API returned ${resp.status}` }
     } catch (e) {
-      return { valid: false, message: `Connection failed: ${(e as Error).message}` }
+      return { valid: false, message: `⚠️  Connection failed: ${(e as Error).message}` }
     }
   }
 }
