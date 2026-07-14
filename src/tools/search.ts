@@ -86,7 +86,7 @@ export async function searchLessons(params: SearchParams): Promise<string> {
   for (const l of data.lessons) {
     output += `### ${l.semantic_code} | ${l.severity.toUpperCase()} | 👍${l.usefulness_score} ✅${l.verified_count}\n`
     output += `**Problem:** ${l.problem}\n`
-    output += `**Fix:** ${l.fix}\n`
+    output += `**Fix:** ${l.fix || '→ Use get_lesson for full details'}\n`
     if (l.key_lesson) output += `**Key Lesson:** ${l.key_lesson}\n`
     output += `Systems: ${(l.system || []).join(', ')} | Domains: ${(l.domain || []).join(', ')}\n\n`
   }
