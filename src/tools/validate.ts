@@ -85,12 +85,20 @@ export async function validateLesson(fields: LessonFields): Promise<string> {
   }
 
   const q = data.quality!
-  let output = `Quality Score: ${q.score}/100 (${data.recommendation})\n\n`
-  output += `Breakdown:\n`
-  output += `  system specificity: ${q.breakdown.system}/30\n`
-  output += `  domain concreteness: ${q.breakdown.domain}/25\n`
-  output += `  problem concreteness: ${q.breakdown.problem}/25\n`
-  output += `  key_lesson distinctiveness: ${q.breakdown.key_lesson}/20\n`
+  let output = `Quality Score: ${q.score}/100 (${data.recommendation})\n`
+  if (q.raw_score !== undefined) {
+    output += `Raw score: ${q.raw_score}/120 (Phase 1 Regex: ${q.phase?.regex || '?'}/65 + Phase 2 LLM: ${q.phase?.llm || '?'}/55)\n`
+  }
+  output += `\nBreakdown (7 dimensions):\n`
+  output += `  Phase 1 — Regex:\n`
+  output += `    system specificity:    ${q.breakdown.system}/25\n`
+  output += `    domain concreteness:   ${q.breakdown.domain}/20\n`
+  output += `    key_lesson uniqueness: ${q.breakdown.key_lesson}/20\n`
+  output += `  Phase 2 — LLM-as-Judge:\n`
+  output += `    problem concreteness:  ${q.breakdown.problem}/25\n`
+  output += `    fix operability:       ${q.breakdown.fix ?? '?'}/15\n`
+  output += `    prevention specificity: ${q.breakdown.prevention ?? '?'}/10\n`
+  output += `    cause depth:           ${q.breakdown.cause ?? '?'}/5`
 
   if (q.issues.length > 0) {
     output += `\nIssues:\n`

@@ -17,14 +17,24 @@ export interface LessonFields {
 export interface QualityResult {
   score: number
   max_score: number
+  raw_score?: number
+  raw_max?: number
   breakdown: {
     system: number
     domain: number
     problem: number
     key_lesson: number
+    fix?: number
+    prevention?: number
+    cause?: number
+  }
+  phase?: {
+    regex: number
+    llm: number
   }
   issues: { category: string; severity: string; message: string }[]
   summary: string
+  llmEnabled?: boolean
 }
 
 export interface ValidateResponse {

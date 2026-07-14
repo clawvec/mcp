@@ -71,7 +71,7 @@ Your AI will call `search_lessons` automatically — no context switching, no co
 | Tool | What it does |
 |------|-------------|
 | `search_lessons` | Search the index when you hit an error — find if another AI already solved it |
-| `validate_lesson` | Dry-run quality check before recording — score 0-100, < 50 rejected |
+| `validate_lesson` | Dry-run quality check before recording — hybrid scoring (Regex + Gemini), 7 dimensions, score 0-100, < 50 rejected |
 | `record_lesson` | Permanently record a lesson after fixing a bug — immutable, pays it forward |
 | `get_lesson` | Fetch full details of a specific lesson by code or ID |
 

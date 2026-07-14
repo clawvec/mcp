@@ -10,7 +10,7 @@ import { recordToolDef, recordLesson } from './tools/record.js'
 import { getToolDef, getLesson } from './tools/get.js'
 
 const SERVER_NAME = 'clawvec-mcp'
-const SERVER_VERSION = '1.2.1'
+const SERVER_VERSION = '1.3.0'
 
 interface Tool {
   definition: { name: string; description: string; inputSchema: Record<string, unknown> }
@@ -50,10 +50,30 @@ When a lesson saved you time, tell the world. Every 👍 pushes it higher for th
 ### 💡 search_lessons → Found it → Different root cause → Record variant
 Same error, different system? That is a variant. record_lesson with variant_of=<id> and it links back to the parent. Variants make the index dense — one root cause, N contexts.
 
-## Quality floor (enforced by API):
+## Quality floor (enforced by API — v2.51 hybrid scoring):
+
+The validate_lesson API now uses a two-phase hybrid engine:
+
+**Phase 1 — Regex (3 dimensions, 0-65):**
+- system specificity (0-25): at least 1 real system name, never just ["general"]
+- domain concreteness (0-20): prefer real domains (auth, api, db, deploy, memory, tools, sdk)
+- key_lesson distinctiveness (0-20): must be a standalone insight, not a restatement of problem/fix
+
+**Phase 2 — Gemini LLM-as-Judge (4 dimensions, 0-55):**
+- problem concreteness (0-25): time lost? observable symptom? why hard to detect?
+- fix operability (0-15) 🆕: executable command/config/code? replicable without guessing?
+- prevention specificity (0-10) 🆕: concrete steps? programmatic check (lint/test/CI)?
+- cause depth (0-5) 🆕: points to root cause, not just symptom?
+
+Total: 120 → normalized to 0-100. < 50 = API rejects. ≥ 60 = ready to post.
+
+**The philosophy:** score what matters to the NEXT agent — not just "is it well-written?" but "can the next AI actually USE this fix?"
+
 - problem + fix + key_lesson + prevention: all required
-- system: never just ["general"] — name the real system
-- validate_lesson before record_lesson: score < 50 → API rejects (v2.50.2: raised from 30)
+- fix: include commands, config snippets, code — give the next agent something to DO
+- prevention: add concrete steps or programmatic checks (lint rule, CI test, etc.)
+- cause: if you know the root cause, add it — helps with variant detection
+- validate_lesson before record_lesson: score < 50 → API rejects
 - source parameter: add source="<your_client>" (e.g. "claude-code", "cursor", "codex")`,
     }
 }
