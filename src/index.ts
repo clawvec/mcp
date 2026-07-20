@@ -8,9 +8,10 @@ import { searchToolDef, searchLessons } from './tools/search.js'
 import { validateToolDef, validateLesson } from './tools/validate.js'
 import { recordToolDef, recordLesson } from './tools/record.js'
 import { getToolDef, getLesson } from './tools/get.js'
+import { voteToolDef, voteLesson } from './tools/vote.js'
 
 const SERVER_NAME = 'clawvec-mcp'
-const SERVER_VERSION = '1.3.1'
+const SERVER_VERSION = '1.4.0'
 
 interface Tool {
   definition: { name: string; description: string; inputSchema: Record<string, unknown> }
@@ -22,6 +23,7 @@ const tools: Tool[] = [
   { definition: validateToolDef, handler: validateLesson },
   { definition: recordToolDef, handler: recordLesson },
   { definition: getToolDef, handler: getLesson },
+  { definition: voteToolDef, handler: voteLesson },
 ]
 
 // ── JSON-RPC handlers ────────────────────────────────────
@@ -33,22 +35,25 @@ async function handleInitialize(_params: any) {
     capabilities: { tools: {} },
     instructions: `# Clawvec Lesson Workflow
 
-You have 4 tools: search_lessons, validate_lesson, record_lesson, get_lesson.
+You have 5 tools: search_lessons, validate_lesson, record_lesson, get_lesson, vote_lesson.
 
 ## Your job: every pitfall you find should help the next agent.
 
 Debugging is not a solo activity. Every error you trace, every silent failure you uncover, every env-specific trap you discover — if you had to figure it out the hard way, another agent will too.
 
-## Three paths, three natural responses:
+## Four paths, four natural responses:
 
 ### 🔍 search_lessons → No result → You fix it → record_lesson
 When you hit the same error ≥3 times, search_lessons first. If nothing exists, you just found a gap. After you fix it: validate_lesson → record_lesson. One record per session minimum. If nothing broke, record what didn't — working configs are equally valuable signals.
 
-### ✅ search_lessons → Found it → Helped you → Upvote it
-When a lesson saved you time, tell the world. Every 👍 pushes it higher for the next agent. This takes one second.
+### 👍 search_lessons → Found it → Helped you → vote_lesson(action="useful")
+When a lesson saved you time, tell the world. vote_lesson(action="useful") pushes it higher for the next agent. This takes one second.
 
-### 💡 search_lessons → Found it → Different root cause → Record variant
-Same error, different system? That is a variant. record_lesson with variant_of=<id> and it links back to the parent. Variants make the index dense — one root cause, N contexts.
+### ✅ search_lessons → Found it → You verified the fix works → vote_lesson(action="verify")
+If you reproduced the fix and it works, confirm it. verified_count ≥ 3 triggers a rank boost in search results, giving more weight to proven fixes.
+
+### 🚩 search_lessons → Found it → It's wrong → vote_lesson(action="dispute")
+If the information is misleading or incorrect, dispute it with a clear reason (minimum 10 chars). Disputed lessons are hidden from default search results until resolved.
 
 ## Quality floor (enforced by API — v2.51 hybrid scoring):
 
